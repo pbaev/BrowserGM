@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--Mahalo My Dudes- /u/Van2Can-->
+<link rel="stylesheet" type="text/css" href="../styles/docs-md.css">
+<link href="https://fonts.googleapis.com/css?family=Public+Sans:400,700&display=swap" rel="stylesheet">
+<title>Documentation</title>
+</head>
+<body>
+    <div class="button-container">
+        <div class="nav-button"><a href="index.html">Play</a></div>
+        <div class="nav-button"><a href="player-guide.html">Player Guide</a></div>
+		<div class="nav-button"><a href="docs.html">Documentation</a></div>
+		<div class="nav-button"><a href="https://github.com/pbaev">Github</a></div>
+	</div>
+	
+<div class="content-container">
+
+<h1>Developer Docs</h1>
+<p>BrowserGM is a project made with Vue.js.</p>
+<p>This documentation contains descriptions of the website structure, classes, global variables, and global methods.</p>
+<h1 data-breakpage>Structure</h1>
+<h4>npm</h4>
+<p>npm is used in development but not production, the following plugins are used:</p>
+<p><u>babel</u> Used for the ability to write ES6.</p>
+<p><u>browserify</u> Compiles all imports/exports into one file, bundle.js.</p>
+<p><u>http-server</u> Runs a local server.</p>
+<p>Below are the custom scripts run with &gt; npm run &#39;script&#39;:</p>
+<p><u>compile</u> Compiles all JavaScript files into one bundle.js</p>
+<p><u>server</u> Runs a server.</p>
+<p><u>build-all</u> Compiles files then runs the server.</p>
+<h4>Folder Structure</h4>
+<pre><code>dist/
+	bundle.js
+node_modules/
+src/
+	classes/
+	components/
+	images/
+	pages/
+	scripts/
+	styles/
+.babelrc
+package.json
+packag-lock.json
+</code></pre>
+<p><u>dist/</u> Contains the bundle.js game file which is the compiled version of all JavaScript files in &#39;src/&#39;.</p>
+<p><u>src/classes/</u> Contains separate files for each class.</p>
+<p><u>src/components/</u> Contains files of components separated by category.</p>
+<p><u>src/images/</u> Contains any website images, mainly player faces.</p>
+<p><u>src/pages/</u> Contains all HTML files as well as .md versions of the documentation.</p>
+<p><u>src/scripts/</u> Contains files of global methods separated by category.</p>
+<p><u>src/styles/</u> Contains CSS files for the game and documentation</p>
+<h1 data-breakpage>Classes</h1>
+<h2>Player</h2>
+<pre><code>Player = {
+	age: Integer,
+	attributes: {
+		blocking: Integer,
+		diq: Integer,			// defensive iq
+		discipline: Integer,
+		faceOff: Integer,
+		handEye: Integer,
+		hands: Integer,
+		hitting: Integer,
+		hustle: Integer,
+		oiq: Integer,			// offensive iq
+		passing: Integer,
+		skating: Integer,
+		slap: Integer,			// slap shot
+		stamina: Integer,
+		stick: Integer,			// stick work (defensively)
+		strength: Integer,
+		wrist: Integer			// wrist shot
+	},
+	contract: { cap: Float, years: Integer },
+	country: String,
+	face: Integer,
+	fullName: String,
+	id: Integer,
+	league: String,
+	newContract: { cap: Float, years: Integer },
+	position: String,
+	positionStrength: {
+		lw: Float,
+		c: Float
+			rw: Float,
+			ld: Float,
+			rd: Float
+		},
+		potential: {
+		ceiling: {int: Integer, name: String, shownInt: Integer, shownName: String},
+		chance:  {int: Integer, name: String, shownInt: Integer, shownName: String},
+		certainty: {int: Integer, name: String}
+	},
+	progression: {same as attributes},
+	stats: { 
+		2020: { // Skater
+			assists: Integer,
+			gamesPlayed: Integer,
+			goals: Integer,
+			pim: Integer,		// penalty minutes
+			points: Integer,
+			shots: Integer,
+			toi: Integer,		// time on ice
+		}
+		2019: { // Goalie
+			gaa: Float,			// goals against average
+			gamesPlayed: Integer,
+			goalsAgainst: Integer,
+			savePctg: Float,
+			saves: Integer,
+			toi: Integer
+		},
+		...
+	},
+	team: Team.id
+}
+</code></pre>
+<h4>age</h4>
+<p>The player&#39;s age. All players age on the same day when seasons change on July 1st.</p>
+<h4>attributes</h4>
+<p>Attributes determine a player&#39;s effectiveness in game, each attribute is weighted by position for it&#39;s contribution to the player&#39;s effectiveness. The weighting is done by <strong>Player.categoryScores()</strong>.</p>
+<h4>contract</h4>
+<p>The player&#39;s current contract. If a player is not signed with a team their contract is {cap: 0, years: 0}.</p>
+<h4>face</h4>
+<p>The id of the player&#39;s face image. All faces can be found in &#39;images/players&#39;.</p>
+<h4>fullName</h4>
+<p>The player&#39;s full name. Derivatives like last or first name can be retrieved with <strong>Player.name()</strong>.</p>
+<h4>id</h4>
+<p>The player&#39;s randomly generated id. The id ranges from 10 9999999, they numbers no significance.</p>
+<h4>league</h4>
+<p>The player&#39;s current league. Can be one of: &#39;onehl&#39;, &#39;twohl&#39;, &#39;thrhl&#39;, &#39;juniors&#39;, &#39;prospects&#39;, &#39;freeAgents&#39;.</p>
+<h4>newContract</h4>
+<p>If a player has signed an extension in the last year of their contract,  then newContract is their extension. If no extension has been signed newContract is an empty object.</p>
+<h4>position</h4>
+<p>The player&#39;s position, can be one of: &#39;lw&#39;, &#39;c&#39;, &#39;rw&#39;, &#39;ld&#39;, &#39;rd&#39;, &#39;g&#39;.</p>
+<h4>positionStrength</h4>
+<p>Indicates a multiplier of player effectiveness when playing a position that isn&#39;t their main one.</p>
+<h4>potential</h4>
+<p>Ceiling is the maximum overall the player can attain. Chance is the probability of a player&#39;s ceiling being achievable, an actual ceiling is calculated based on chance in <strong>playerProgression()</strong>. Certainty is the user&#39;s certainty in a player&#39;s ceiling and potential when they are a prospect, this is based on scouting.</p>
+<h4>progression</h4>
+<p>Tracks the amount a player has progressed or regressed in each attribute since the start of the season.</p>
+<h4>stats</h4>
+<p>Each year of a player&#39;s stats is tracked up to 4 years.</p>
+<h4>team</h4>
+<p>The player&#39;s current team&#39;s id. If the player is a free agent the team is 0, if the player is a prospect the team is the team&#39;s region.</p>
+<h4>Player.categoryScores()</h4>
+<p>Returns a defensive and offensive player score to demonstrate the player&#39;s effectiveness in each category. Attributes are weighted on a scale of 1 or act as multipliers, a perfect score is 100 in a category.</p>
+<p>Defence Score</p>
+<figure><table>
+<thead>
+<tr><th style='text-align:center;' >Attribute</th><th style='text-align:center;' >Left Wing</th><th style='text-align:center;' >Center</th><th style='text-align:center;' >Right Wing</th><th style='text-align:center;' >Left Defence</th><th style='text-align:center;' >Right Defence</th></tr></thead>
+<tbody><tr><td style='text-align:center;' >blocking</td><td style='text-align:center;' >0.25</td><td style='text-align:center;' >0.25</td><td style='text-align:center;' >0.25</td><td style='text-align:center;' >0.20</td><td style='text-align:center;' >0.20</td></tr><tr><td style='text-align:center;' >diq</td><td style='text-align:center;' >0.35</td><td style='text-align:center;' >0.35</td><td style='text-align:center;' >0.35</td><td style='text-align:center;' >0.35</td><td style='text-align:center;' >0.35</td></tr><tr><td style='text-align:center;' >hitting</td><td style='text-align:center;' >0.10</td><td style='text-align:center;' >0.10</td><td style='text-align:center;' >0.10</td><td style='text-align:center;' >0.20</td><td style='text-align:center;' >0.20</td></tr><tr><td style='text-align:center;' >handEye</td><td style='text-align:center;' >0.10</td><td style='text-align:center;' >0.10</td><td style='text-align:center;' >0.10</td><td style='text-align:center;' >0.10</td><td style='text-align:center;' >0.10</td></tr><tr><td style='text-align:center;' >stick</td><td style='text-align:center;' >0.30</td><td style='text-align:center;' >0.30</td><td style='text-align:center;' >0.30</td><td style='text-align:center;' >0.25</td><td style='text-align:center;' >0.25</td></tr></tbody>
+</table></figure>
+<p>Offence Score</p>
+<figure><table>
+<thead>
+<tr><th style='text-align:center;' >Attribute</th><th style='text-align:center;' >Left Wing</th><th style='text-align:center;' >Center</th><th style='text-align:center;' >Right Wing</th><th style='text-align:center;' >Left Defence</th><th style='text-align:center;' >Right Defence</th></tr></thead>
+<tbody><tr><td style='text-align:center;' >handEye</td><td style='text-align:center;' >0.10</td><td style='text-align:center;' >0.10</td><td style='text-align:center;' >0.10</td><td style='text-align:center;' >0.10</td><td style='text-align:center;' >0.10</td></tr><tr><td style='text-align:center;' >hands</td><td style='text-align:center;' >0.20</td><td style='text-align:center;' >0.20</td><td style='text-align:center;' >0.20</td><td style='text-align:center;' >0.15</td><td style='text-align:center;' >0.15</td></tr><tr><td style='text-align:center;' >oiq</td><td style='text-align:center;' >0.30</td><td style='text-align:center;' >0.40</td><td style='text-align:center;' >0.30</td><td style='text-align:center;' >0.40</td><td style='text-align:center;' >0.40</td></tr><tr><td style='text-align:center;' >slap</td><td style='text-align:center;' >0.15</td><td style='text-align:center;' >0.10</td><td style='text-align:center;' >0.15</td><td style='text-align:center;' >0.25</td><td style='text-align:center;' >0.25</td></tr><tr><td style='text-align:center;' >wrist</td><td style='text-align:center;' >0.35</td><td style='text-align:center;' >0.30</td><td style='text-align:center;' >0.35</td><td style='text-align:center;' >0.10</td><td style='text-align:center;' >0.10</td></tr></tbody>
+</table></figure>
+<p>Multipliers</p>
+<figure><table>
+<thead>
+<tr><th style='text-align:center;' >Attribute</th><th style='text-align:center;' >Multiple</th></tr></thead>
+<tbody><tr><td style='text-align:center;' >hustle</td><td style='text-align:center;' >0.95 1.05</td></tr><tr><td style='text-align:center;' >passing</td><td style='text-align:center;' >0.9 1.1</td></tr><tr><td style='text-align:center;' >skating</td><td style='text-align:center;' >0.875 1.125</td></tr><tr><td style='text-align:center;' >strength</td><td style='text-align:center;' >0.95 1.05</td></tr></tbody>
+</table></figure>
+<p><u>returns</u> {offence: Integer, defence: Integer}</p>
+<h4>Player.desiredContract()</h4>
+<p>Generates what contract the player would like to receive.</p>
+<p><u>returns</u> {cap: Float, years: Integer}</p>
+<h4>Player.generateAge()</h4>
+<p>On player creation, this generates a player age based on the player type.</p>
+<p><u>returns</u> Integer</p>
+<h4>Player.generateAttributes()</h4>
+<p>On player creation, this generates the player&#39;s starting attributes based on player type.</p>
+<p><u>returns</u> attributes object</p>
+<h4>Player.generateContract()</h4>
+<p>On player creation, this generates the player&#39;s contract based on <strong>Player.desiredContract()</strong> which is then slightly altered.</p>
+<p><u>returns</u> {cap: Float, years: Integer}</p>
+<h4>Player.generateCountry()</h4>
+<p>On player creation, this generates the player&#39;s country. If the player is a prospect, the country is based on their team&#39;s region.</p>
+<p><u>returns</u> String</p>
+<h4>Player.generateName()</h4>
+<p>On player creation, this generates the player&#39;s name. Names combinations are based on NHL players.</p>
+<p><u>returns</u> String</p>
+<h4>Player.generatePosition()</h4>
+<p>On player creation, generates the player&#39;s position if not already specified.</p>
+<p><u>returns</u> String</p>
+<h4>Player.generatePotential()</h4>
+<p>On player creation, generates the player&#39;s potential based on type.</p>
+<p><u>returns</u> potential object</p>
+<h4>Player.generateProgression()</h4>
+<p>On player creation, generates the player&#39;s progression of attributes, all values will be 0.</p>
+<p><u>returns</u> attribute object</p>
+<h4>Player.generateProgression()</h4>
+<p>On player creation, generates the player&#39;s stats for the season, all values will be 0&#39;s.</p>
+<p><u>returns</u> stats object</p>
+<h4>Player.name()</h4>
+<p>Based on the player&#39;s name, produce their first name, last name, an abbreviated name (First Last -&gt; F. Last)</p>
+<p><u>returns</u> {abb: String, first: String, last: String}</p>
+<h4>Player.overall()</h4>
+<p>Produces an overall player score. This based on the offence and defence scores of <strong>Player.categoryScores()</strong>, which are then weighted by position.</p>
+<figure><table>
+<thead>
+<tr><th style='text-align:center;' >Position</th><th style='text-align:center;' >Offence</th><th style='text-align:center;' >Defence</th></tr></thead>
+<tbody><tr><td style='text-align:center;' >Center</td><td style='text-align:center;' >0.7</td><td style='text-align:center;' >0.3</td></tr><tr><td style='text-align:center;' >Left Wing / Right Wing</td><td style='text-align:center;' >0.8</td><td style='text-align:center;' >0.2</td></tr><tr><td style='text-align:center;' >Defence</td><td style='text-align:center;' >0.2</td><td style='text-align:center;' >0.8</td></tr><tr><td style='text-align:center;' >Goalie</td><td style='text-align:center;' >0</td><td style='text-align:center;' >1</td></tr></tbody>
+</table></figure>
+<p><u>returns</u> Integer</p>
+<h4>Player.playerId()</h4>
+<p>On player creation, generates an unused player id.</p>
+<p><u>returns</u> Integer</p>
+<h4>Player.positionStrength()</h4>
+<p>Produces a multiplier of player effectiveness when playing a position that isn&#39;t their main one.</p>
+<p><u>returns</u> positionStrength object</p>
+<h4>Player.release()</h4>
+<p>Releases a player from their current team and adds them to free agency.</p>
+<h4>Player.removeFromLines()</h4>
+<p>Removes a player from all of their team&#39;s lines. This is used when a player is traded or going to free agency.</p>
+<h4>Player.retire()</h4>
+<p>Removes the player entirely from the game.</p>
+<h4>Player.seedRnd(low: Integer, high : Integer, num : Integer)</h4>
+<p>Same as <strong>rnd()</strong> which generates a random number between high and low. Using the same num for a specific player will produce the same random number for the span of a season. This is used for example in <strong>desiredContract()</strong> to add variance in contracts that stay the same over the course of the year.</p>
+<p><u>low</u> Lower end of the inclusive random range.</p>
+<p><u>high</u> Upper end of the inclusive random range.</p>
+<p><u>num</u> The random seed.</p>
+<p><u>returns</u> Integer</p>
+<h4>Player.switchTeam(team : Team.id)</h4>
+<p>Switches the player&#39;s team to a new one and deals with all related processes.</p>
+<p><u>team</u> The new team the player is going to.</p>
+<h4>Player.teamName()</h4>
+<p>Produces the player&#39;s team&#39;s name.</p>
+<p><u>returns</u> {city: String, logo: String, full: String, abb: String}</p>
+<h4>Player.tradeValue()</h4>
+<p>Generates a player&#39;s trade value based on contract, overall, potential, age, and other factors.</p>
+<p><u>returns</u> Integer</p>
+<h2>Team</h2>
+<pre><code>Team = {
+	id: Integer,
+	juniors: [Player.id,  ...],
+	league: String,
+	lines: {
+		g: [Player.id, Player.id],
+		specialTeams: {
+			pk: [Player.id, ...],
+			pp: [Player.id, ...]
+		},
+		v33: {
+			c:  [Player.id, ...],
+			ld: [Player.id, ...],
+			lw: [Player.id, ...],
+			rd: [Player.id, ...],
+			rw: [Player.id, ...]
+		},
+		v34: {...},
+		v35: {...},
+		v43: {...},
+		v44: {...},
+		v45: {...},
+		v53: {...},
+		v54: {...},
+		v55: {...}
+	},
+	name: {
+		abb: String,
+		city: String,
+		full: String,
+		logo: String
+	},
+	outlook: String,
+	picks: {
+		2020: [{player: any, position: any, round: Integer, team: Team.id}, {...}, ...],
+		2021: [...],
+		2022: [...]
+	},
+	players: [Player.id, ...],
+	stats: {
+		fol: Integer,			// face off wins
+		fow: Integer,			// face off losses
+		gamesPlayed: Integer,
+		goalsAgainst: Integer,
+		goalsFor: Integer,
+		losses: Integer,
+		otl: Integer,			// overtime losses
+		otw: Integer,			// overtime wins
+		pkTime: Integer,
+		pkga: Integer,			// penalty kill goals against
+		pkgf: Integer,			// penalty kill goals for
+		pks: Integer,
+		ppTime: Integer,
+		ppga: Integer,			// power play goals against
+		ppgf: Integer,			// power play goals for
+		pps: Integer,
+		saves: Integer,
+		shots: Integer,
+		sol: Integer,			// shootout losses
+		sow: Integer,			// shootout wins
+		wins: Integer
+	}
+}
+</code></pre>
+<h4>id</h4>
+<p>A three digit long id. The first digit signifies the team&#39;s league: 1 1HL, 2 2HL, 3 3HL. The last two range from 00 31, teams with the same last two digits are affiliates.</p>
+<h4>juniors</h4>
+<p>An array of the team&#39;s players that are currently in juniors. Only applies to teams in the 1HL.</p>
+<h4>league</h4>
+<p>The league the team is playing in, one of: &#39;onehl&#39;, &#39;twohl&#39;, &#39;thrhl&#39;.</p>
+<h4>lines</h4>
+<p><u>g</u> The team&#39;s two goalies, the first being the starter.</p>
+<p><u>specialTeams</u> An array of the players selected to be on the penalty kill and power play</p>
+<p><u>v55, vXY, ...</u> Lines for the given strength. X is the amount of players on the ice for the given team, Y is for the number of players of the opponent. Each position has an array of Player.ids, the position of the id in the array signifies which line the player is on. An id of 0 represents an empty slot, not a player.</p>
+<h4>name</h4>
+<p><u>abb</u> The team&#39;s abbreviation, ex: &#39;SEA&#39;</p>
+<p><u>city</u> The team&#39;s city, ex: &#39;Seattle&#39;</p>
+<p><u>full</u> The team&#39;s city and logo, ex: &#39;Seattle Battle Cattle&#39;</p>
+<p><u>logo</u> The team&#39;s logo/name, ex: &#39;Battle Cattle&#39;</p>
+<h4>outlook</h4>
+<p>The team&#39;s goal when making trades and roster moves. Not yet used.</p>
+<h4>picks</h4>
+<p>An array of the team&#39;s draft picks for the current draft and the next two.</p>
+<p><u>player</u> The id of the player selected with the pick, false if no player is selected.</p>
+<p><u>position</u> The position of the draft pick in the draft (ex: #143), this is null before the draft since it&#39;s based on team standings at the end of the year.</p>
+<p><u>round</u> The round of the draft pick.</p>
+<p><u>team</u> The pick&#39;s original team, this is used to decide the pick position.</p>
+<h4>players</h4>
+<p>An array of all the ids of players on the team.</p>
+<h4>stats</h4>
+<p>Team statistics for the current season.</p>
+<h4>Team.addPlayers(players : any)</h4>
+<p>Adds the given players to the team&#39;s player list.</p>
+<p><u>players</u> Either an array of player ids or a single player id.</p>
+<h4>Team.allPlayers(juniors : Boolean)</h4>
+<p>Produces an array of all players from the current team and affiliate teams.</p>
+<p><u>juniors</u> If true, players in junior are included.</p>
+<p><u>returns</u> array of Player.ids</p>
+<h4>Team.capSpent(left : Boolean)</h4>
+<p>Produce the team&#39;s cap expenditure relative to the current salary cap.</p>
+<p><u>left</u> If true, produces the cap left to spend. If false, produces the cap already spent.</p>
+<p><u>returns</u> Float</p>
+<h4>Team.changePicks(action : String, pick: Object)</h4>
+<p>Adds or removes the given pick from the team.</p>
+<p><u>action</u> One of: &#39;add&#39; or &#39;remove&#39;.</p>
+<p><u>pick</u> The pick object being moved, {player: any, position: any, round: Integer, team: Team.id}.</p>
+<h4>Team.checkLineValidity()</h4>
+<p>Checks if the team&#39;s lines are valid. Used to stop simulation until the user fixes their lines.</p>
+<p><u>returns</u> Boolean, true if lines are valid.</p>
+<h4>Team.extendAll()</h4>
+<p>Before the end of a season, this extends contracts of desirable players with expiring contracts.</p>
+<h4>Team.farmTeam(league : Team.league)</h4>
+<p>Produces the affiliate team from the given league.</p>
+<p><u>league</u> One of: &#39;onehl&#39;, &#39;twohl&#39;, &#39;thrhl&#39;.</p>
+<h4>Team.generateLines(custom : any, specialTeams : any, goalies: any)</h4>
+<p>Generates all lines with the given customization. If any parameters are false, the parameter will automatically be set.</p>
+<p><u>custom</u> An object containing the desired 5v5 lines.</p>
+<p><u>specialTeams</u> Array of skater ids that will play on the powerplay and penalty kill. </p>
+<p><u>goalies</u> Array of desired goalie ids in starting order.</p>
+<h4>Team.generateName()</h4>
+<p>Generate the team&#39;s name on creation.</p>
+<p><u>returns</u> name Object</p>
+<h4>Team.generateOutlook()</h4>
+<p>Generates the team&#39;s goal when making trades and roster decisions, currently unused.</p>
+<h4>Team.overall()</h4>
+<p>Produces the team&#39;s overall for their forwards, defence, and goalies, display on roster page.</p>
+<p><u>returns</u> {forwards: Integer, defence: Integer, goalies: Integer}</p>
+<h4>Team.playerInterest(id : Player.id)</h4>
+<p>Produce and adjusted player trade value based on how the player fits with the team&#39;s outlook. Currently unused.</p>
+<h4>Team.playerPositionSummary()</h4>
+<p>Produces the amount of players the team and its affiliates have in every position, has category &#39;all&#39; which is all players, and category &#39;cap&#39; which is players with a contract above minimum.</p>
+<p><u>returns</u> {all: { lw: Integer, c: Integer, rw: Integer, ld: Integer, rd: Integer g: Integer}, cap: {...}}</p>
+<h4>Team.points()</h4>
+<p>Produces the amount of standings points the team has this season.</p>
+<p><u>returns</u> Integer</p>
+<h4>Team.rank(stat : String, suffix : Boolean)</h4>
+<p>Produces the team&#39;s league wide rank in the given stat.</p>
+<p><u>stat</u> Any stat in Team.stats</p>
+<p><u>suffix</u> If true will add a suffix like &#39;th&#39; to the end of the rank.</p>
+<p><u>returns</u> String</p>
+<h4>Team.removePlayers(players : any)</h4>
+<p>Removes the given players to the team&#39;s player list.</p>
+<p><u>players</u> Either an array of player ids or a single player id.</p>
+<h4>Team.sortRoster()</h4>
+<p>Moves players between team affiliates, and calls players up from juniors as is seen fit.</p>
+<h4>Team.topPlayer(stat : String)</h4>
+<p>Produces the player with the highest value in the given stat on the team, used on the home page.</p>
+<p><u>returns</u> {name : Player.fullName, value: Integer or Float, id: Player.id}</p>
+<h2>Game</h2>
+<pre><code>Game = {
+	away: Team.id,
+	date: {day: Integer, month: integer, year: integer},
+	home: Team.id,
+	id: Integer,
+	league: Team.league,
+	stats: {
+		away: {
+			fol: Integer,			// face off wins
+			fow: Integer,			// face off losses
+			pkTime: Integer,
+			pkga: Integer,			// penalty kill goals against
+			pkgf: Integer,			// penalty kill goals for
+			pks: Integer,
+			ppTime: Integer,
+			ppga: Integer,			// power play goals against
+			ppgf: Integer,			// power play goals for
+			pps: Integer,
+			saves: Integer,
+			shots: Integer,
+		},
+		home: {...}
+	},
+	summary: {
+		extraTime: any,
+		goals: [{time: Integer, 
+				points: [Player.id, Player.id, Player.id],
+				strength: String}, 
+				{...}],
+		penalties:  [{time: Integer, id: Player.id},
+					{...}]
+	},
+	type: String
+}
+</code></pre>
+<h4>away</h4>
+<p>The away team&#39;s id.</p>
+<h4>date</h4>
+<p>The date on which the game occurs</p>
+<h4>home</h4>
+<p>The home team&#39;s id.</p>
+<h4>id</h4>
+<p>The game&#39;s id. Id&#39;s are unique to the game&#39;s league.</p>
+<h4>league</h4>
+<p>The league of the teams playing.</p>
+<h4>stats</h4>
+<p>The in game stats that occurred in the given game.</p>
+<h4>summary</h4>
+<p>Game summary displayed when a game page is viewed.</p>
+<h4>type</h4>
+<p>Either &#39;regular&#39; for regular season games or &#39;playoff&#39; for playoff games.</p>
+<h4>Game.generateId()</h4>
+<p>Generates the game&#39;s id.</p>
+<h4>Game.nextPlayoffGame(seriesInfo : object)</h4>
+<p>Adds the next playoff game to the schedule if the series is not complete.</p>
+<p><u>seriesInfo</u> The matchup summary of the series, {score: [Integer, Integer], hi: Team.id, lo: Team.id}</p>
+<h4>Game.simGame()</h4>
+<p>Simulates the game. Simulation is based on a 1 tick per game second system, each tick potentially triggers: line changes, possession changes, zone changes, shots, penalties, and stoppages.</p>
+<h1 data-breakpage>Global Variables</h1>
+<p>These contain all the data that ends up in a save file. They all exist under Vue.prototype.$variableName.</p>
+<h2>Vue.prototype.$players</h2>
+<pre><code>Vue.prototype.$players = {
+	onehl: [Player.id, ...],
+	twohl: [Player.id, ...],
+	thrhl: [Player.id, ...],
+	juniors: [Player.id, ...],
+	prospects: [Player.id, ...],
+	freeAgents: [Player.id, ...],
+	Player.id: Player,
+	...
+}
+</code></pre>
+<p>Keys which are league names contain all Player.ids of players currently playing in that league. Numeric keys are Player.ids, their value is the respective Player class.</p>
+<h2>Vue.prototype.$teams</h2>
+<pre><code>Vue.prototype.$teams = {
+	onehl: {100: Team, 101: Team, ..., 131: Team},
+	twohl: {200: Team, 201: Team, ..., 231: Team},
+	thrhl: {300: Team, 301: Team, ..., 331: Team}
+	prospects: {
+		canada: {players: [Player.id, ...]},
+		easternEurope: {players: [Player.id, ...]},
+		europe: {players: [Player.id, ...]},
+			scandanavia: {players: [Player.id, ...]},
+		states: {players: [Player.id, ...]},
+		rest: {players: [Player.id, ...]}
+	}
+}
+</code></pre>
+<p>&#39;onehl&#39;, &#39;twohl&#39;, and &#39;thrhl &#39;contain all the Teams as {Team.id: Team}. Juniors do not have their own Teams but are incorporated in their 1HL parent Team.</p>
+<p>Prospects are not Teams but just objects. At the moment they only have one key: &#39;players&#39;, which is a list of the Player.ids of Players in that region.</p>
+<h2>Vue.prototype.$gameInfo</h2>
+<p>Contains all meta information about the game.</p>
+<pre><code>Vue.prototype.$gameInfo = {
+	autoRoster: Boolean,
+	colours: {
+		main: HEX Colour,
+		light: HEX Colour,
+	}
+	history: [{details: {...}, sub: String, url: String}, ...],
+	page: {
+			url: String,
+			sub: String
+		details: {}
+	},
+	player: {
+		team: Team.id
+	},
+	salaryCap: Integer,
+	scouting: {
+		canada: {percentage: Integer[0,100], points: Integer[0,100]},
+		easternEurope: {...}
+		europe: {...},
+			scandanavia: {...},
+		states: {...},
+		rest: {...}
+	},
+	time: {
+		date: {
+			day: Integer[1,31],
+			month: Integer[1,12],
+			year: Integer(&gt;= 2019)
+		}
+		period: String
+		season: Integer(&gt;= 2020)
+	}
+	
+}
+</code></pre>
+<h4>autoRoster</h4>
+<p>False by default. If set to true the user&#39;s team will automatically have its roster changed, lines changes, and trades made.</p>
+<h4>colours</h4>
+<p>Colours are set when starting a new game, and used to style the HTML. <strong>colour()</strong> can be used as a shorthand.</p>
+<h4>history</h4>
+<p>History of the last 50 pages visited by the user, needed for the back button, managed by <strong>addressChange()</strong>.</p>
+<h4>page</h4>
+<p>The page that&#39;s currently displayed.</p>
+<p><u>url</u> The base url, when viewing any page this is the string before the &#39;/&#39;. There is one base url for every category in the top navbar as well as a few others. These are used to render main components in webContainer. Examples: &#39;home&#39;, &#39;player&#39;, &#39;rosters&#39;, &#39;free-agents&#39;.</p>
+<p><u>sub</u> The sub url, when viewing most pages, this is the string after the &#39;/&#39;. Under the main component rendered by the base url, the sub renders a specific page. Examples: {url: &#39;roster&#39;, sub: &#39;contracts&#39;},{url: &#39;player&#39;, sub: &#39;783527&#39;}, {url: &#39;home&#39;, sub:&#39;&#39;}</p>
+<p><u>details</u>  Any important data from the previous page. This is used when going back to a page that had user entered info, so that the user doesn&#39;t have to re-enter all the info. Example: if the user views a player profile while in the trade screen then presses back, all the players added to the trade would still be there, without details there would be a new empty trade page.</p>
+<h4>player</h4>
+<p>Contains info about the user playing the game.</p>
+<p><u>team</u> The player&#39;s 1HL team.</p>
+<h4>salaryCap</h4>
+<p>The current salary cap, this is currently kept at a constant 85 Million.</p>
+<h4>scouting</h4>
+<p>Determines a user&#39;s certainty about a draft prospect&#39;s potential.</p>
+<p><u>percentage</u> Set by the user in &#39;scouting/&#39;, the proportion of scouting currently set to the region.</p>
+<p><u>points</u> The cumulative certainty for each region, used by <strong>Player.function()</strong>.</p>
+<h4>time</h4>
+<p><u>date</u> The current date, same format is used for almost all dates.</p>
+<p><u>period</u> The period of the current date, is one of: &#39;pre-season&#39;, &#39;regular&#39;, &#39;playoff-r1&#39;, &#39;playoff-r2&#39;, &#39;playoff-r3&#39;, &#39;playoff-r4&#39;, &#39;off-season&#39;.</p>
+<p><u>season</u> The year in which the playoffs occur. For the 2019/2020 season, season = 2020.</p>
+<h2>Vue.prototype.$schedule</h2>
+<pre><code>Vue.prototype.$schedule = {
+	dates: {
+		onehl: {
+			&#39;day-month-year&#39;: [Game.id, Game.id, ...],
+			&#39;1-10-2019&#39;: [Game.id, Game.id, ...],
+			...
+		},
+		twohl: {...},
+		thrhl: {...}
+	},
+	id: {
+		onehl: {
+			{{Game.id}}: Game,
+			{{Game.id}}: Game,
+			...
+		},
+		twohl: {...},
+		thrhl: {...}
+	},
+	teams: {
+		onehl: {
+			100: [Game.id, Game.id, ...],
+			...,
+			131: [Game.id, Game.id, ...],
+		},
+		twohl: {...},
+		thrhl: {...}
+	}
+}
+</code></pre>
+<h4>dates</h4>
+<p>Each key is a date in the format day-month-year, days without a game or event won&#39;t have a key. The value is a list of either games that will be simulated on that day.</p>
+<h4>id</h4>
+<p>Contains the actual Game class for every game in each league. Leagues will have overlapping ids.</p>
+<h4>teams</h4>
+<p>Contains the Game.ids that each team will play.</p>
+<h2>Vue.prototype.$events</h2>
+<pre><code>Vue.prototype.$events = {
+	draft: {
+		currentPick: Integer[1,224],
+		available: [Player.id, Player.id, ...],
+		drafted: [Player.id, Player.id, ...],
+		ranked: [Player.id, Player.id, ...]
+	},
+	freeAgency: {
+		day: Integer or String,
+		Player.id: [
+			{team: Team.id, cap: Float, years: Integer },
+			{...},
+			...
+		],
+		...	
+	},
+	playoffs: {
+		onehl: {
+			r1: {
+					&#39;1v16&#39;: {
+						hi: Team.id, 
+						lo: Team.id, 
+						score: [Integer (&lt;= 4), Integer (&lt;= 4)]
+					}
+				&#39;2v15&#39;: {...},
+				&#39;3v14&#39;: {...},
+				...
+			}
+			r2: {...},
+			r3: {...},
+			r4: {...}
+		},
+		twohl: {...},
+		thrhl: {...}
+	}
+}
+</code></pre>
+<p>Contains all data about special events, currently there is only draft.</p>
+<h4>draft</h4>
+<p>Data about the entry draft, this is initiated when first entering the draft an reset at year end (July 1st).</p>
+<p><u>currentPick</u> The current pick, in other words the earliest unused pick.</p>
+<p><u>available</u> A list of Player.ids of players that are available to be drafted.</p>
+<p><u>drafted</u> A list of Player.ids of players that have already been drafted.</p>
+<p><u>ranked</u> A list of Player.ids ranked by &quot;value&quot;.</p>
+<h4>freeAgency</h4>
+<p>Data specifically about the first month (July) of free agency.  During this period contract are not automatically accepted, instead team periodically offer contracts and players will periodically accept the best offer.</p>
+<p><u>day</u> If in the month of July this is the current day of free agency which is used in <strong>freeAgencyUpdate()</strong> and used to determine contract cap hits. If outside of July day is &#39;finished&#39;.</p>
+<p><u>Player.id</u> The offers received by the player from each team.</p>
+<h4>playoffs</h4>
+<p>Data about the playoff bracket including scores and matchups for each league.</p>
+<p><u>r1, r2, r3, r4</u> Each round of the playoffs, &#39;r1&#39; being the first round, &#39;r4&#39; being the finals.</p>
+<p><u>1v16, 2v15, XvY</u> The matchup between the team seeded X and Y. &#39;hi&#39; is the higher seeded team, &#39;lo&#39; is the lower seeded team, &#39;score&#39; is the amount of wins for each team in the order high then low.</p>
+<h2>Vue.prototype.$news</h2>
+<pre><code>Vue.prototype.$news = [
+	&#39;Your team has 11M left to spend in free agency&#39;,
+	String,
+	...
+]
+</code></pre>
+<p>Contains up to 10 news items which appear in order on the home page. News strings can be made using <strong>newNews()</strong>.</p>
+<h2>Vue.prototype.$saves</h2>
+<pre><code>Vue.prototype.$saves = {
+	quickSave1: String,
+	quickSave2: String,
+	quickSave3: String
+}
+</code></pre>
+<p>Contains up to 3 quick saves which can be made by the user in the save menu. The objects contain all global variables needed to load a previous game. This is the same information that regular save files contain. The data is saved as a string and can be loaded with <strong>gameLoad()</strong>. The save contains information from all global variables other than this one and class.</p>
+<h2>Vue.prototype.$class</h2>
+<pre><code>Vue.prototype.$class = {
+	Game: Game,
+	Player: Player,
+	Team: Team
+}
+</code></pre>
+<p>Contains the 3 classes. To make a new class: new Vue.prototype.$class.Player.Player({...}).</p>
+<h1 data-breakpage>Global Methods</h1>
+<p>Global methods are kept in gMixin, which is then imported into every component so that these methods can always be accessed. Methods are stored in separate files by general category, this is in the scripts directory. All methods are listed here alphabetically.</p>
+<h4>addressChange(url : String, sub : String, details : object)  tools.js</h4>
+<p>Changes the current page, responsible for displaying components. Sets <strong>Vue.prototype.$gameinfo.page</strong> with the given info, also sets <strong>Vue.prototype.$gameinfo.history</strong> with previous pages.</p>
+<p><u>url</u> The main category of navigation, which controls which main component is displayed. All main components are in main.js.</p>
+<p><u>sub</u> The sub category of navigation, which controls which sub component is displayed. These components are located in their respective files under the components folder.</p>
+<p><u>details</u> Optional object that passes along extra details. This is used to store context important data in history. For example, if a player clicks on a player profile when making a trade, details would store all the players already added to the trade so that the user wouldn&#39;t have to re-add them every time they leave the page.</p>
+<h4>cleanTeamRosters() ai.js</h4>
+<p>Calls <strong>Team.sortRoster()</strong> and <strong>Team.generateLines(false, false, false)</strong> for every team. </p>
+<h4>colour() tools.js</h4>
+<p>Short hand for Vue.prototype.$gameInfo.colours, used in component styles.</p>
+<p><u>returns</u> {main: HEX Colour, light: HEX Colour}</p>
+<h4>freeAgencyUpdate() ai.js</h4>
+<p>During the month of July, this periodically generates offers from each team and periodically accepts the best offer received by each player. Offers are made based on team positional needs both in terms of the 1HL roster as well as depth. Players will reject offers below a certain threshold, otherwise they will accept even if there is only one offer.</p>
+<h4>generateGame() new-game.js</h4>
+<p>Sets up everything to start a new game of BrowserGM.</p>
+<h4>laterDate(date1 : object, date2 : object)</h4>
+<p>Produces whether or not date1 is later than date2.</p>
+<p><u>date 1</u> {day: Integer, month: Integer, year: Integer}</p>
+<p><u>date 2</u> {day: Integer, month: Integer, year: Integer}</p>
+<p><u>returns</u> Boolean</p>
+<h4>loadGame(givenData : String) tools.js</h4>
+<p>Loads either a save file or a quick save.</p>
+<p><u>givenData</u> One of: &#39;upload&#39;, &#39;quickSave1&#39;, &#39;quickSave2&#39;, &#39;quickSave3&#39;</p>
+<h4>newNews(type : any, item : any) tools.js</h4>
+<p>Adds a new news String to <strong>Vue.prototype.$news</strong> which then appears on the home page. Up to 10 news events are remembered. </p>
+<p><u>type</u> Either string or false. String can be one of: &#39;retire&#39;, &#39;contract&#39;, &#39;extension&#39;, &#39;free agent&#39;, or &#39;cap&#39;, this will produce the given news type using the item. If false,item is a string that will be directly added to the news log.</p>
+<p><u>item</u> Contextual data based on the type. Used to produce unique news events.</p>
+<h4>nextDays(currentDay : object, days: Integer) schedule.js</h4>
+<p>Produces a date which is &#39;days&#39; after the currentDay.</p>
+<p><u>currentDay</u> {day: Integer, month: Integer, year: Integer}</p>
+<p><u>days</u> The numbers of days to advance.</p>
+<p><u>returns</u> {day: Integer, month: Integer, year: Integer}</p>
+<h4>playerProgression() progression.js</h4>
+<p>Progresses all players. Progression amount is based on several factors like age, points, potential, overall, time on ice, and league. Progression can be either positive or negative.</p>
+<h4>playoffRound(round : Integer) playoff.js</h4>
+<p>Generates the given playoff round, after playoffs have already been initialised with <strong>playoffStart()</strong>.</p>
+<p><u>round</u> One of: 2, 3, or 4</p>
+<h4>playoffStart() playoff.js</h4>
+<p>Initially generates the playoffs, this data is stored in <strong>Vue.prototype.$events.playoffs</strong>.</p>
+<h4>prettyDate(date : object) schedule.js</h4>
+<p>Takes a date object and makes it a readable string.</p>
+<p><u>date</u> {day: Integer, month: Integer, year: Integer}</p>
+<p><u>returns</u> Date in string format, ex: October 20th 2019</p>
+<h4>prospectFogOfWar() prospect.js</h4>
+<p>Obfuscates prospects&#39; potentials shown to the user. The level of obfuscation is determined by the user&#39;s scouting points from <strong>Vue.prototype.$gameInfo.scouting</strong>.</p>
+<h4>prospectGen() prospect.js</h4>
+<p>Generates 300 prospects from each region for the yearly entry draft.</p>
+<h4>readableTime(time : Integer) tools.js</h4>
+<p>Converts the given time on ice into a readable time in minutes and seconds.</p>
+<p><u>time</u> Time on ice in total seconds</p>
+<p><u>returns</u> String in format MM:SS, ex: &#39;17:34&#39;</p>
+<h4>rnd(low : Integer, high : Integer) tools.js</h4>
+<p>Randomly generates a number between low and high. Low and high are included in the range.</p>
+<p><u>low</u> The bottom end of the range.</p>
+<p><u>high</u> The top end of the range.</p>
+<p><u>returns</u> Integer</p>
+<h4>retirees() year-end.js</h4>
+<p>At the end of the year, this retires old players randomly as well as all player with a low overall past a certain age.</p>
+<h4>sameObject(object1 : object, object2: object) tools.js</h4>
+<p>Compares the given objects to see if they have the same keys and values. Made because {} !== {}.</p>
+<h4>parameters</h4>
+<p><u>object1</u> Any object</p>
+<p><u>object2</u> Any object</p>
+<p><u>returns</u> Boolean</p>
+<h4>scheduleGen(length: Integer, startDate: object) schedule.js</h4>
+<p>Generates a game schedule in <strong>Vue.prototype.$schedule</strong> starting at startDate that is length games long. There is an average of one game every two days, matchups are randomly assigned.</p>
+<p><u>length</u> The number of games each team will player</p>
+<p><u>startDate</u> The first possible date for games</p>
+<h4>signNecessaryDepth() ai.js</h4>
+<p>For all teams any empty roster slots are filled with free agents. If enough free agents do not exist, players are created and added to rosters.</p>
+<h4>simToDate(endDate : object) sim.js</h4>
+<p>Simulates games and events until the end date. Numerous functions will be ran at certain dates, for example <strong>playerProgression()</strong>, <strong>retirees()</strong>, and <strong>yearEnd()</strong>.</p>
+<p><u>endDate</u> The date simulated until but not including, in format {day: Integer, month: Integer, year: Integer}</p>
+<h4>startPreSeason() schedule.js</h4>
+<p>Makes the pre-season and its games.</p>
+<h4>startSeason() schedule.js</h4>
+<p>Makes the regular season and its 82 game schedule.</p>
+<h4>teamConvert(league : Team.league, team: Team.id) </h4>
+<p>Produces the respective affiliate team in the given league.</p>
+<p><u>league</u> The league of the team that will be returned, one of: &#39;onehl&#39;, &#39;twohl&#39;, &#39;thrhl&#39;</p>
+<p><u>team</u> The give team id</p>
+<p><u>returns</u> integer, ex: teamConvert(&#39;thrhl&#39;, 105) -&gt; 305</p>
+<h4>tradeBuriedPlayers() ai.js</h4>
+<p>Makes teams trade each other buried players of different positions. Buried players are those with contract above the minimum who are not playing in the 1HL due to lots of positional depth on their team.</p>
+<h4>tradeForNeeds() ai.js</h4>
+<p>Makes teams trade players of their positional strengths for positional weaknesses. This only applies to player above a minimum contract in the 1HL.</p>
+<h4>tradeToEvenDepth() ai.js</h4>
+<p>Makes teams trade to even up their organizational depth by position, this applies to players in the 2HL and 3HL.</p>
+<h4>tradeUnderCap() ai.js</h4>
+<p>Makes teams that are over the cap go under through trades.</p>
+<h4>yearEnd() ai.js</h4>
+<p>Deals with all processes to reset the season at the end of the year on July 1st. Examples of processes include resetting stats, aging players, and advancing contracts.</p>
+<h4>yearEndResign() ai.js</h4>
+<p>Makes each team resign their players including those in juniors that are of a certain quality, this is done just before contracts expire July 1st.</p>
+		
+		
+
+</div>
+    
+</body>
+</html>
