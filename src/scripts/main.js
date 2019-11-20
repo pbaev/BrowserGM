@@ -428,7 +428,7 @@ var startPage = {
       <div>
         <a :style="{'background':colour().light}" class="start-page-choice-small light-text" href="docs.html">Documentation</a>
         <a :style="{'background':colour().light}" class="start-page-choice-small light-text" href="player-guide.html" >Playing Rules</a>
-        <a :style="{'background':colour().light}" class="start-page-choice-small light-text" href="https://github.com/pbaev" >Github</a>
+        <a :style="{'background':colour().light}" class="start-page-choice-small light-text" href="https://github.com/pbaev/BrowserGM" >Github</a>
       </div>
     </div>
 
